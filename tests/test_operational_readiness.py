@@ -270,9 +270,12 @@ def test_streams_are_hashed_fully_without_raw_persistence(project):
 def test_masked_diagnostics_are_bounded_private_and_queries_do_not_prune(project):
     secret = 'unique-super-secret-value'
     payload = 'x' * 8187 + '\ntoken=' + secret + '\n' + 'z' * 300000
-    configure(project, [sys.executable, '-c', 'import sys;sys.stdout.write(sys.argv[1])', payload],
+    configure(project, [sys.executable, '-c',
+                        'import sys;sys.stdout.write("x"*8187+"\\ntoken="+sys.argv[1]+"\\n"+"z"*300000)', secret],
               diagnostics={**tram.DIAGNOSTICS, 'enabled': True})
     result = tram.verify_run(project, 'sample', 'test')
+    assert result['execution_status'] == 'succeeded'
+    assert result['output']['stdout']['bytes'] == len(payload.encode())
     path = project / '.tram/local/diagnostics' / result['id']
     data = (path / 'stdout.log').read_bytes()
     assert secret.encode() not in data
