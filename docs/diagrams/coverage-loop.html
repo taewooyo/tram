@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>/coverage 시스템 루프 — 어댑터별 흐름</title>
+<style>
+  :root{
+    --ink:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+    --blue:#2563eb; --blue-bg:#eff6ff;
+    --green:#059669; --green-bg:#ecfdf5;
+    --orange:#c2410c; --orange-bg:#fff7ed;
+    --gate:#ca8a04; --gate-bg:#fef9c3;
+    --gray:#475569; --gray-bg:#f8fafc;
+    --loop:#6366f1;
+  }
+  *{box-sizing:border-box;}
+  body{font-family:-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;color:var(--ink);
+       background:#fff;margin:0;padding:28px 34px;width:1000px;}
+  h1{font-size:22px;margin:0 0 4px;}
+  h1 .tag{font-size:12px;font-weight:800;color:var(--loop);background:#eef2ff;border:1px solid #c7d2fe;
+          border-radius:999px;padding:3px 10px;vertical-align:middle;margin-left:8px;}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 6px;line-height:1.5;}
+  .sub b{color:var(--ink);}
+  .key{margin:10px 0 14px;background:#f5f3ff;border:1px solid #ddd6fe;border-left:5px solid var(--loop);
+       border-radius:10px;padding:10px 14px;font-size:12.5px;line-height:1.5;color:#4338ca;}
+  .band{margin-top:14px;background:var(--orange-bg);border:1px solid #fed7aa;border-left:5px solid var(--orange);
+        border-radius:12px;padding:12px 16px;}
+  .band .bh{font-weight:800;font-size:13.5px;color:#9a3412;margin-bottom:10px;}
+  .band .bh span{font-weight:700;color:#c2410c;font-size:11.5px;}
+  .guards{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+  .guard{background:#fff;border:1px solid #fdba74;border-radius:9px;padding:8px 11px;font-size:12px;line-height:1.35;}
+  .guard .gt{font-weight:800;color:#9a3412;}
+  .guard .gd{color:#7c2d12;}
+  .guard.esc{border-color:#fca5a5;}
+  .guard.esc .gt{color:#b91c1c;}
+  .legend{margin-top:16px;border-top:1px solid var(--line);padding-top:12px;display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--muted);}
+  .legend b{color:var(--ink);}
+  .sw{display:inline-block;width:12px;height:12px;border-radius:3px;border:1px solid;vertical-align:middle;margin-right:5px;}
+</style>
+<style>.project-source{margin-top:14px;padding-top:10px;border-top:1px solid #e5e7eb;color:#64748b;font-size:11px;line-height:1.6;letter-spacing:0;overflow-wrap:anywhere}.project-source a{color:#475569;text-decoration:underline}.project-source code{font-size:10px}</style></head>
+<body><div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:9px 13px;margin-bottom:14px;font-size:12px;line-height:1.5;color:#4338ca"><b>Tram 진입</b> · init 프로젝트 연결 → start 요청·재개 · status는 조회만<br><b>전체 18개 경로: 메인 하나 · 저위험 직접 수행 / 필요 시 위임</b> · 아래 전문 루프는 기존 운영 유지<br><b>도식 표기</b> · /스킬은 역할 약칭이며 터미널 명령이 아님. 설치 목록: tram:init · tram:start · tram:status<br><b>Codex 사용 예</b> · “Tram의 start 스킬로 기능을 개발해줘.” · Claude: /tram:start &lt;요청&gt;</div>
+  <h1>/coverage 시스템 루프 <span class="tag">명시적 adapter 필요</span></h1>
+  <p class="sub"><b>프로젝트 프로필의 어댑터를 선택해 테스트만 보태고 커버리지를 반복 개선</b>합니다. 신규 프로젝트는 미설정이며, 선택한 adapter와 허용 테스트 범위에서 측정합니다.</p>
+  <div class="key">설정 예시: <b>kotlin-kover</b> → 프로젝트 JVM task·XML 경로·목표를 명시.<br>변경은 프로필 <code>testPaths</code> 안의 테스트 파일만 허용합니다. Android 기기 계측 테스트·KMP iOS·JS·Native는 포함하지 않습니다.</div>
+
+  <svg viewBox="0 0 1000 770" width="100%" xmlns="http://www.w3.org/2000/svg"
+       font-family="-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif">
+    <defs>
+      <marker id="ag" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker>
+      <marker id="aok" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#059669"/></marker>
+      <marker id="astop" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#c2410c"/></marker>
+      <marker id="aloop" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6366f1"/></marker>
+    </defs>
+    <style>
+      text{fill:#1f2937;}
+      .t{font-size:13px;font-weight:800;}
+      .s{font-size:10.5px;font-weight:600;fill:#6b7280;}
+      .lab{font-size:11.5px;font-weight:800;}
+      .e{stroke:#94a3b8;stroke-width:1.7;fill:none;}
+      .branch{font-size:11px;font-weight:700;fill:#475569;}
+    </style>
+
+    <!-- adapter selection branches -->
+    <polygon points="500,2 570,30 500,58 430,30" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
+    <text class="t" x="500" y="34" text-anchor="middle" fill="#a16207">어댑터 선택</text>
+    <path class="e" d="M445,42 L263,70" marker-end="url(#ag)"/>
+    <path class="e" d="M555,42 L737,70" marker-end="url(#ag)"/>
+    <rect x="40" y="72" width="430" height="42" rx="9" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+    <text class="t" x="255" y="91" text-anchor="middle" fill="#2563eb">Python · 호환 어댑터</text>
+    <text class="s" x="255" y="106" text-anchor="middle">legacy만 app/·85% 기본 · 신규는 명시 설정</text>
+    <rect x="530" y="72" width="430" height="42" rx="9" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+    <text class="t" x="745" y="91" text-anchor="middle" fill="#059669">명시적 Kotlin 설정 · Kover</text>
+    <text class="s" x="745" y="106" text-anchor="middle">프로필의 모듈·목표·task/report·testPaths 사용</text>
+    <path class="e" d="M255,114 V120 H500 V132" marker-end="url(#ag)"/>
+    <path class="e" d="M745,114 V120 H500"/>
+
+    <g transform="translate(0,110)">
+    <!-- preflight -->
+    <rect x="290" y="14" width="420" height="52" rx="10" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+    <text class="t" x="500" y="37" text-anchor="middle" fill="#475569">[준비] preflight — 하나라도 안 맞으면 멈춤</text>
+    <text class="s" x="500" y="55" text-anchor="middle">환경·프로필·깨끗한 비기본 브랜치·작업 그래프</text>
+    <path class="e" d="M500,66 V94" marker-end="url(#ag)"/>
+
+    <!-- 1. 측정 -->
+    <rect x="350" y="96" width="300" height="52" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+    <text class="t" x="500" y="119" text-anchor="middle" fill="#2563eb">1. 실행 담당 측정 — 어댑터 테스트·report</text>
+    <text class="s" x="500" y="137" text-anchor="middle">Kover: Gradle 재실행 → 새 XML → 라인 집계</text>
+    <path class="e" d="M500,148 V172" marker-end="url(#ag)"/>
+
+    <!-- D1: 메인: 달성? -->
+    <polygon points="500,172 584,208 500,244 416,208" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.6"/>
+    <text class="t" x="500" y="213" text-anchor="middle" fill="#a16207" font-size="12.5">메인: 달성?</text>
+    <path class="e" d="M584,208 H720" stroke="#059669" marker-end="url(#aok)"/>
+    <text class="lab" x="648" y="200" fill="#059669">예</text>
+    <rect x="722" y="184" width="256" height="48" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="1.5"/>
+    <text class="t" x="736" y="205" fill="#059669">✅ 종료 — 목표 달성</text>
+    <text class="s" x="736" y="222">결과 보고 · coverage-health.md 누적</text>
+    <path class="e" d="M500,244 V270" marker-end="url(#ag)"/>
+    <text class="lab" x="512" y="262" fill="#6b7280">아니오</text>
+
+    <!-- 2. 테스트 추가 -->
+    <rect x="350" y="272" width="300" height="52" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+    <text class="t" x="500" y="295" text-anchor="middle" fill="#059669">2. 실행 담당 테스트 추가 — 허용 경로만</text>
+    <text class="s" x="500" y="313" text-anchor="middle">제품 로직·범위 설정은 수정하지 않음</text>
+    <path class="e" d="M500,324 V348" marker-end="url(#ag)"/>
+
+    <!-- 3. 라운드 검증 -->
+    <rect x="292" y="350" width="416" height="70" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+    <text class="t" x="500" y="372" text-anchor="middle" fill="#2563eb">3. 라운드 검증 — 진척 인정 3조건 동시충족</text>
+    <text class="s" x="500" y="391" text-anchor="middle" font-size="11">① 대상 전체 테스트 통과      ② 커버리지 상승</text>
+    <text class="s" x="500" y="408" text-anchor="middle" font-size="11">③ 독립 reviewer 통과 (빈·무어서션 테스트 차단)</text>
+    <path class="e" d="M500,420 V446" marker-end="url(#ag)"/>
+
+    <!-- D2: 메인: 채택? -->
+    <polygon points="500,446 586,480 500,514 414,480" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.6"/>
+    <text class="t" x="500" y="485" text-anchor="middle" fill="#a16207" font-size="12.5">메인: 채택?</text>
+    <path class="e" d="M456,497 H360 V526" stroke="#059669" marker-end="url(#aok)"/>
+    <text class="lab" x="405" y="512" fill="#059669">예</text>
+    <rect x="250" y="528" width="220" height="50" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="1.6"/>
+    <text class="t" x="360" y="550" text-anchor="middle" fill="#059669">4. 실행 담당 체크포인트</text>
+    <text class="s" x="360" y="567" text-anchor="middle">허용된 개별 테스트 파일만 로컬 커밋</text>
+    <path class="e" d="M544,497 H640 V526" stroke="#c2410c" marker-end="url(#astop)"/>
+    <text class="lab" x="556" y="512" fill="#c2410c">아니오</text>
+    <text class="s" x="592" y="470" fill="#c2410c" font-weight="700">후퇴·게이밍</text>
+    <rect x="530" y="528" width="220" height="50" rx="10" fill="#fff7ed" stroke="#c2410c" stroke-width="1.6"/>
+    <text class="t" x="640" y="550" text-anchor="middle" fill="#c2410c">롤백</text>
+    <text class="s" x="640" y="567" text-anchor="middle">이번 라운드의 허용 파일만 되돌림</text>
+
+    <!-- loop-back: 체크포인트·롤백 → 다시 1.측정 -->
+    <path d="M360,578 V606" fill="none" stroke="#6366f1" stroke-width="1.7" stroke-dasharray="6 4"/>
+    <path d="M640,578 V606" fill="none" stroke="#6366f1" stroke-width="1.7" stroke-dasharray="6 4"/>
+    <path d="M640,606 H90 V122 H348" fill="none" stroke="#6366f1" stroke-width="1.7" stroke-dasharray="6 4" marker-end="url(#aloop)"/>
+    <path d="M360,606 H90" fill="none" stroke="#6366f1" stroke-width="1.7" stroke-dasharray="6 4"/>
+    <text class="lab" x="150" y="600" fill="#6366f1">↺ 다음 라운드 — 다시 1. 측정으로</text>
+    </g>
+  </svg>
+
+  <!-- 안전판 밴드 -->
+  <div style="font-size:11.5px;color:#4338ca;line-height:1.5;margin-top:10px"><b>직렬 실행</b> · 변경 → 전체 검사·측정 → 독립 리뷰 → 메인 채택·중단 → 실행 담당 checkpoint<br><b>HEAD 변경 후</b> · 같은 라운드 최신 HEAD verify-run + fresh reviewer를 다시 확보한 뒤 complete</div><div class="band">
+    <div class="bh">🛡 안전판 — 무인의 안전은 여기서 나온다 &nbsp;<span>· 매 라운드 끝 점검 → 걸리면 루프 탈출·중단·사람</span></div>
+    <div class="guards">
+      <div class="guard"><span class="gt">⏱ 예산 상한</span> <span class="gd">— 최대 8라운드 / 30분 / 60,000토큰. 하나라도 닿으면 즉시 중단·보고</span></div>
+      <div class="guard"><span class="gt">🚧 진척 없음 가드</span> <span class="gd">— 커버리지가 K=2라운드 연속 상승 없으면 “막힘”으로 중단</span></div>
+      <div class="guard"><span class="gt">⛓ 서킷브레이커</span> <span class="gd">— 변경이 설정된 테스트 경로 밖(제품 로직·스키마·설정)으로 번지면 중단 → 사람</span></div>
+      <div class="guard esc"><span class="gt">↑ 에스컬레이션</span> <span class="gd">— 테스트만으로 커버리지가 안 오르면 설계문제로 /plan·/impl (게이트 경로)</span></div>
+    </div>
+  </div>
+
+  <!-- 범례 -->
+  <div class="legend">
+    <span><span class="sw" style="background:var(--blue-bg);border-color:#bfdbfe"></span><b>측정 · 검증</b></span>
+    <span><span class="sw" style="background:var(--green-bg);border-color:#a7f3d0"></span><b>변경 · 체크포인트 · 달성</b></span>
+    <span><span class="sw" style="background:var(--orange-bg);border-color:#fed7aa"></span><b>롤백 · 중단 · 안전판</b></span>
+    <span><span class="sw" style="background:var(--gate-bg);border-color:#fde047"></span><b>결정(분기)</b></span>
+    <span><span class="sw" style="background:#eef2ff;border-color:#c7d2fe"></span><b style="color:#4f46e5">↺ 루프백</b> 다음 라운드</span>
+    <span><span class="sw" style="background:var(--gray-bg);border-color:#cbd5e1"></span><b>준비(preflight)</b></span>
+  </div>
+<div class="orchestration" style="margin:12px 0;padding:10px 13px;border:1px solid #c7d2fe;border-radius:10px;font-size:11.5px;line-height:1.55"><span style="color:#4f46e5"><b>■ 메인 하나</b> · 사용자 질문·승인·위험 판단·배정·결과 통합·runtime 제어·Task 기록</span><br><span style="color:#2563eb"><b>■ 작업자</b> · 필요 근거로 배정 · 소유 범위 실행 → 근거 반환 · 재위임 금지 · 작은 순차 저위험 작업은 메인 직접 가능</span><br><b>실행 순서</b> · 순차 기본 · 파일·포트·DB·출력 독립 시 병렬 / 공유 자원 직렬 · light 직접 가능 / full은 매 라운드 fresh reviewer<br><b>기록 경계</b> · full·quick·coverage·perf만 기존 Task · 자료 작업에 새 full 시작 강제 없음 · status 메인 조회만<br><b>자료 작업</b> · retro는 자동 수정·새 파일 없음 · skill-stat은 읽기 집계만 · PRD reviewer는 문서 대조, runtime full 검사와 구분</div><div class="project-source">Tram · 후보 0.0.1 / schema 2 · <a href="../../OS.md">청사진</a> · <a href="../../src/context/start-experience.md">실행·재개 안내</a> · <a href="../../docs/support.md">지원 조건</a> · <a href="../../docs/release-validation.md">검증 기록</a><br>
+Codex·Claude Code 공개 alpha 준비 · native 설치부터 제거까지 전체 검증 미완료 · 두 호스트의 전체 작업·재개 흐름은 추가 검증 필요<br>
+준비 상태는 읽기 전용 doctor로 확인 · ready는 관측한 준비 범위이며 승인·작업 완료·호스트 검증을 뜻하지 않음<br>
+init → start → PRD 확정 → Plan 승인 → 구현 ⇄ 검증 · status 읽기만 · full은 fresh reviewer의 실제 독립 검토</div></body>
+</html>

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Commit"
+  short_description: "변경사항을 검토하고 로컬 커밋합니다"
+  default_prompt: "Use $commit to review and commit the current changes locally."
+
+policy:
+  allow_implicit_invocation: true

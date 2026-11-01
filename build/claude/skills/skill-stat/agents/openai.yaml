@@ -1,0 +1,7 @@
+interface:
+  display_name: "Skill Statistics"
+  short_description: "스킬 호출 기록을 통계로 집계합니다"
+  default_prompt: "Use $skill-stat to summarize this project's skill usage."
+
+policy:
+  allow_implicit_invocation: true

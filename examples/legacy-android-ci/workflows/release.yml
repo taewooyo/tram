@@ -1,0 +1,11 @@
+name: Generated AAB
+
+on:
+  push:
+    branches:
+      - release
+
+jobs:
+  call:
+    uses: deepfine/mob_github_workflows_android/.github/workflows/release.yml@main
+    secrets: inherit

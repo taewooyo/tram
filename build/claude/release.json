@@ -1,0 +1,23 @@
+{
+  "adapters": [
+    "codex",
+    "claude"
+  ],
+  "compatibility": "Schema 1 requires explicit migration; rollback requires 2-to-1 migration and revalidation.",
+  "host": "claude",
+  "operationalStatus": "unverified",
+  "publicReadiness": {
+    "license": "Apache-2.0",
+    "securityChannel": "github-private-vulnerability-reporting"
+  },
+  "releaseStatus": "candidate",
+  "schemaMax": 2,
+  "schemaMin": 2,
+  "schemaVersion": 2,
+  "validatedHosts": [],
+  "validationTargets": {
+    "claude": "2.1.92",
+    "codex": "0.166.0"
+  },
+  "version": "0.0.1"
+}

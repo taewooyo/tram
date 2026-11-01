@@ -1,0 +1,16 @@
+{
+  "name": "tram",
+  "owner": {
+    "name": "taewooyo"
+  },
+  "metadata": {
+    "description": "Tram 개발 하네스"
+  },
+  "plugins": [
+    {
+      "name": "tram",
+      "source": "./build/claude",
+      "description": "요구사항·계획 승인부터 구현·검증·재개까지"
+    }
+  ]
+}

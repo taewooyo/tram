@@ -1,0 +1,4 @@
+interface:
+  display_name: "Coverage"
+  short_description: "Raise project coverage safely with its configured adapter"
+  default_prompt: "Use $coverage with the explicit project adapter; preserve Python defaults only for legacy compatibility calls."

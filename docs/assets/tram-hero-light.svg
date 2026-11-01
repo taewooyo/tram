@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="430" viewBox="0 0 1200 430" role="img" aria-labelledby="title desc">
+<title id="title">Tram — 의도는 선명하게, 개발은 끝까지</title><desc id="desc">요구사항 확정과 계획 승인 뒤 구현과 검증을 이어가는 개발 하네스. init, start, status.</desc>
+<style>text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Apple SD Gothic Neo',Arial,sans-serif}.still{display:none}@media(prefers-reduced-motion:reduce){.moving{display:none}.still{display:block}}</style>
+<defs><radialGradient id="wash"><stop stop-color="#e4f5f2"/><stop offset="1" stop-color="#f8fafb"/></radialGradient>
+<filter id="glow" x="-200%" y="-200%" width="500%" height="500%"><feGaussianBlur stdDeviation="6"/></filter></defs><rect width="1200" height="430" rx="22" fill="#f8fafb"/>
+<ellipse cx="935" cy="225" rx="280" ry="205" fill="url(#wash)"/>
+<circle cx="91" cy="67" r="4" fill="#138b8b"/>
+<text x="105" y="72" fill="#64777f" font-size="13" letter-spacing="2.2" font-weight="600">YOUR IDEA. A CLEAR PATH.</text>
+<text x="78" y="223" fill="#17252b" font-size="150" font-weight="800" letter-spacing="-10">tram<tspan fill="#138b8b">.</tspan></text>
+<text x="88" y="279" fill="#17252b" font-size="26" letter-spacing="-.8" font-weight="600">의도는 선명하게. 개발은 끝까지.</text>
+<text x="89" y="311" fill="#64777f" font-size="15">사람의 결정과 에이전트의 실행을 잇는 개발 하네스</text>
+<path d="M705 153 C775 70 1027 69 1084 166 C1157 295 991 364 863 326 C729 286 804 170 920 194 C1015 214 999 280 925 284" fill="none" stroke="#d5e3e7" stroke-width="2"/>
+<path d="M708 169 C779 85 1022 86 1070 175 C1131 287 985 344 868 311 C756 279 818 191 916 209 C989 223 982 266 925 269" fill="none" stroke="#d5e3e7" stroke-width="1"/>
+<path d="M705 153 C775 70 1027 69 1084 166 C1157 295 991 364 863 326 C729 286 804 170 920 194 C1015 214 999 280 925 284" fill="none" stroke="#138b8b" stroke-width="2" stroke-dasharray="4 10" opacity=".4"/>
+<circle cx="705" cy="153" r="7" fill="#f8fafb" stroke="#138b8b" stroke-width="2"/><circle cx="1084" cy="166" r="7" fill="#f8fafb" stroke="#138b8b" stroke-width="2"/><circle cx="863" cy="326" r="7" fill="#f8fafb" stroke="#138b8b" stroke-width="2"/><circle cx="920" cy="194" r="7" fill="#f8fafb" stroke="#138b8b" stroke-width="2"/><circle cx="925" cy="284" r="7" fill="#f8fafb" stroke="#138b8b" stroke-width="2"/><g class="moving"><circle r="15" fill="#138b8b" opacity=".4" filter="url(#glow)"/><circle r="5" fill="#138b8b"/><animateMotion dur="10s" path="M705 153 C775 70 1027 69 1084 166 C1157 295 991 364 863 326 C729 286 804 170 920 194 C1015 214 999 280 925 284" repeatCount="indefinite"/></g>
+<circle class="still" cx="920" cy="194" r="5" fill="#138b8b"/>
+<circle cx="1054" cy="93" r="3" fill="#cd7547"/>
+<text x="707" y="121" fill="#64777f" font-size="11" letter-spacing="1.5">INTENT</text>
+<text x="960" y="386" fill="#64777f" font-size="11" letter-spacing="1.5">VERIFIED CHANGE</text>
+<rect x="89" y="350" width="75" height="29" rx="14.5" fill="#e4f5f2"/><text x="126.5" y="369" text-anchor="middle" fill="#138b8b" font-size="13" font-weight="600">init</text><rect x="177" y="350" width="75" height="29" rx="14.5" fill="#e4f5f2"/><text x="214.5" y="369" text-anchor="middle" fill="#138b8b" font-size="13" font-weight="600">start</text><rect x="272" y="350" width="75" height="29" rx="14.5" fill="#e4f5f2"/><text x="309.5" y="369" text-anchor="middle" fill="#138b8b" font-size="13" font-weight="600">status</text></svg>

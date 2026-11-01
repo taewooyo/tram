@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "contextMappings": [
+    {
+      "path": "docs/*",
+      "card": ".codex/context/doc-conventions.md"
+    },
+    {
+      "path": "app/*",
+      "card": ".codex/context/android-conventions.md"
+    },
+    {
+      "path": "domain/**",
+      "card": ".codex/context/android-conventions.md"
+    },
+    {
+      "path": "data/**",
+      "card": ".codex/context/android-conventions.md"
+    },
+    {
+      "path": "navigator/**",
+      "card": ".codex/context/android-conventions.md"
+    },
+    {
+      "path": "presentation/**",
+      "card": ".codex/context/android-conventions.md"
+    },
+    {
+      "path": "build-logic/**",
+      "card": ".codex/context/android-conventions.md"
+    },
+    {
+      "path": "buildconfig/**",
+      "card": ".codex/context/android-conventions.md"
+    },
+    {
+      "path": "buildconfig-stub/**",
+      "card": ".codex/context/android-conventions.md"
+    },
+    {
+      "path": "gradle/**",
+      "card": ".codex/context/android-conventions.md"
+    },
+    {
+      "path": "*.gradle.kts",
+      "card": ".codex/context/android-conventions.md"
+    }
+  ],
+  "coverage": {
+    "adapter": "kotlin-kover",
+    "target": 85,
+    "modules": [
+      ":app",
+      ":buildconfig",
+      ":buildconfig-stub",
+      ":domain",
+      ":data",
+      ":data:gps:api",
+      ":data:gps:impl",
+      ":data:geojson:api",
+      ":data:geojson:impl",
+      ":data:network:api",
+      ":data:network:impl",
+      ":navigator",
+      ":presentation",
+      ":presentation:scheme",
+      ":presentation:home:api",
+      ":presentation:home:impl",
+      ":presentation:in-bound:api",
+      ":presentation:in-bound:impl",
+      ":presentation:inbound-inspection:api",
+      ":presentation:inbound-inspection:impl",
+      ":presentation:vehicle-location:api",
+      ":presentation:vehicle-location:impl",
+      ":presentation:plate:api",
+      ":presentation:plate:impl"
+    ],
+    "testPaths": [
+      "data/geojson/impl/src/test",
+      "data/network/impl/src/test",
+      "data/src/test",
+      "domain/src/test",
+      "navigator/src/test",
+      "presentation/home/impl/src/test",
+      "presentation/in-bound/impl/src/test",
+      "presentation/inbound-inspection/impl/src/test",
+      "presentation/plate/impl/src/test",
+      "presentation/src/test",
+      "presentation/vehicle-location/impl/src/test"
+    ],
+    "gradle": {
+      "wrapper": "gradlew",
+      "tasks": [
+        {
+          "scope": "jvm",
+          "task": ":koverXmlReport",
+          "report": "build/reports/kover/report.xml"
+        }
+      ]
+    }
+  }
+}

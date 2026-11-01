@@ -1,0 +1,23 @@
+name: 일반 오류 제보
+description: 비밀을 제거한 재현 단계와 실행 결과
+body:
+  - type: markdown
+    attributes:
+      value: 보안·인증·사내 자료와 로그 원문은 올리지 마세요. 보안 문제는 저장소 Security의 비공개 취약점 제보를 사용해 주세요.
+  - type: textarea
+    id: environment
+    attributes:
+      label: Tram·host·OS·Python 버전
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 최소 재현 단계와 기대·실제 동작
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: exit·errorCode·진단/manifest 유무와 미검증 범위
+      description: 민감한 출력 원문 대신 상태와 비밀을 제거한 근거만 기록하세요.

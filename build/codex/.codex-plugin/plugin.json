@@ -1,0 +1,7 @@
+{
+  "description": "요구사항·계획 승인부터 구현·검증·재개까지 이어가는 개발 하네스",
+  "hooks": "./hooks/hooks.json",
+  "name": "tram",
+  "skills": "./skills/",
+  "version": "0.0.1"
+}

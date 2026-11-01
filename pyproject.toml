@@ -1,0 +1,15 @@
+[project]
+name = "tram-harness"
+version = "0.0.1"
+description = "프로젝트 독립 개발 하네스"
+requires-python = ">=3.10"
+dependencies = []
+license = "Apache-2.0"
+
+[project.urls]
+Repository = "https://github.com/taewooyo/tram"
+Issues = "https://github.com/taewooyo/tram/issues"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+norecursedirs = ["fixtures"]

@@ -1,0 +1,23 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.coverage
+htmlcov/
+.codex/skill-usage.log
+.tram/local/
+.env
+*.db
+<!-- tram:begin -->
+.tram/local/
+<!-- tram:end -->
+
+# 이 저장소의 개발 세션·개인 설정·결정 스냅샷은 공개 소스에서 제외
+.tram/
+.codex/
+.idea/
+docs/prd/
+docs/plan/
+reports/
+release/candidate/

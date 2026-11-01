@@ -1,0 +1,43 @@
+name: Tram release candidate validation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: python -m pip install -r requirements-dev.txt
+      - name: Tests including packaged compatibility and schema contracts
+        run: python -m pytest -q --junitxml=reports/pytest.xml
+      - run: python scripts/build.py --check
+      - name: Preserve test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tram-candidate-tests
+          path: reports/pytest.xml
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Versioned candidate archives and checksums
+        run: python scripts/build.py --archive-dir release/candidate
+      - id: version
+        run: echo "value=$(python -c 'import json; print(json.load(open("release/version.json"))["version"])')" >> "$GITHUB_OUTPUT"
+      - name: Operational and public readiness
+        run: |
+          cat release/candidate/readiness.json
+          echo '후보 패키지 검사를 수행했습니다. 실제 호스트 검증과 공개 게시 여부는 readiness.json 및 검증 기록에서 별도로 확인하세요.' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: tram-${{ steps.version.outputs.value }}-candidate
+          path: |
+            release/candidate/
+      # Publishing requires separate live host evidence and human authorization.

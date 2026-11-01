@@ -1,0 +1,17 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommitsDisabled"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "packageRules": [
+    {
+      "description": "Review Tram dependency updates explicitly",
+      "matchManagers": ["pip_requirements", "github-actions"],
+      "automerge": false
+    }
+  ]
+}

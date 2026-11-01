@@ -1,0 +1,15 @@
+name: Check and Build
+
+on:
+  pull_request:
+    branches:
+      - develop
+  push:
+    branches:
+      - develop
+  merge_group:
+
+jobs:
+  call:
+    uses: deepfine/mob_github_workflows_android/.github/workflows/build.yml@main
+    secrets: inherit
