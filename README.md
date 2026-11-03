@@ -3,12 +3,21 @@
 <div align="center">
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/tram-hero-dark.svg">
-  <source media="(prefers-color-scheme: light)" srcset="docs/assets/tram-hero-light.svg">
-  <img src="docs/assets/tram-hero-light.svg" alt="Tram — 의도는 선명하게. 개발은 끝까지." width="100%">
+  <source media="(prefers-color-scheme: dark)" srcset="src/brand/dark/tram-256.png">
+  <source media="(prefers-color-scheme: light)" srcset="src/brand/light/tram-256.png">
+  <img src="src/brand/light/tram-256.png" alt="Tram — 한지 트램과 세 정거장을 잇는 경로" width="128" height="128">
 </picture>
 
-<p><code>0.0.1 공개 alpha 준비</code> · <code>Codex · Claude Code</code> · <code>Python 3.10+</code></p>
+<h1>Tram</h1>
+
+<p><strong>의도는 선명하게. 개발은 끝까지.</strong></p>
+<p>AI 코딩 에이전트를 위한 오픈소스 개발 하네스<br><sub>Codex · Claude Code · 더 많은 에이전트 지원 예정</sub></p>
+
+<p>
+  <a href="https://github.com/taewooyo/tram/actions/workflows/build.yml"><img src="https://github.com/taewooyo/tram/actions/workflows/build.yml/badge.svg?branch=main" alt="CI 검사 상태"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-138B8B?labelColor=17252B" alt="Apache-2.0 라이선스"></a>
+  <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-0.0.1%20alpha-138B8B?labelColor=17252B" alt="0.0.1 alpha"></a>
+</p>
 
 <p>
   <a href="#install">설치</a> ·
@@ -20,7 +29,7 @@
 
 </div>
 
-# 요청에서 검증된 변경까지
+## 요청에서 검증된 변경까지
 
 Tram은 AI 코딩 에이전트에 설치하는 개발 하네스 플러그인입니다. 만들고 싶은 것을 요청하면 프로젝트를 조사하고, 요구사항과 구현 계획을 함께 정한 뒤 구현·테스트·검증을 이어갑니다. 새 세션에서도 남겨 둔 기록으로 작업을 재개합니다.
 
@@ -170,4 +179,11 @@ Claude Code에서도 `/tram:start`로 재개하고 `/tram:status`로 조회합�
 
 [Apache License 2.0](LICENSE).
 
-<div align="center"><sub>요구사항을 정하고. 계획을 승인하고. 검증된 변경까지.</sub><br><a href="#top">맨 위로 ↑</a></div>
+<div align="center">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="src/brand/dark/tram-128.png">
+  <source media="(prefers-color-scheme: light)" srcset="src/brand/light/tram-128.png">
+  <img src="src/brand/light/tram-128.png" alt="Tram" width="48" height="48">
+</picture>
+<br><sub>요구사항을 정하고. 계획을 승인하고. 검증된 변경까지.</sub><br><a href="#top">맨 위로 ↑</a>
+</div>

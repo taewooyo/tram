@@ -9,6 +9,7 @@
 | 막힌 이유 확인·진단·복구 | [운영 안내](operations.md) |
 | 실제로 확인한 결과 | [검증 현황](release-validation.md) |
 | 기능 흐름·설계 원칙 | [개발 흐름](../OS.md) |
+| README·웹·향후 앱의 브랜드 아이콘 | [브랜드 자산](../src/brand/README.md) |
 
 ## 그림으로 보기
 
