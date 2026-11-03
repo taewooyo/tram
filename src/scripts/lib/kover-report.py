@@ -10,9 +10,10 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
-def parse_report(path: Path) -> dict[tuple[str, int], tuple[str, bool]]:
+def parse_report(path: Path):
     root = ET.parse(path).getroot()
-    lines: dict[tuple[str, int], tuple[str, bool]] = {}
+    lines: dict[tuple[str, int], bool] = {}
+    class_sources: dict[str, str] = {}
     for package in root.findall(".//package"):
         package_name = package.attrib.get("name", "")
         source_classes: dict[str, list[str]] = {}
@@ -21,26 +22,30 @@ def parse_report(path: Path) -> dict[tuple[str, int], tuple[str, bool]]:
             source_name = class_node.attrib.get("sourcefilename", "")
             if not class_name:
                 raise ValueError(f"class entry has no name in {path}")
-            source_classes.setdefault(source_name, []).append(class_name)
+            if source_name:
+                source = f"{package_name}/{source_name}"
+                previous = class_sources.get(class_name)
+                if previous and previous != source:
+                    raise ValueError(f"ambiguous source identity for {class_name!r} in {path}")
+                class_sources[class_name] = source
+                source_classes.setdefault(source_name, []).append(class_name)
             for line_node in class_node.findall(".//line"):
-                record_line(lines, package_name, class_name, source_name, line_node, path)
-        # Kover emits line entries under <sourcefile>, sibling to <class>.
-        # Map only when source attribution is unambiguous; otherwise fail closed.
+                record_line(lines, package_name, source_name, line_node, path)
+        # Sourcefile lines already aggregate all classes in that source file.
         for source_node in package.findall("sourcefile"):
             source_name = source_node.attrib.get("name", "")
-            candidates = source_classes.get(source_name, [])
-            if len(candidates) != 1:
-                if source_node.findall("line"):
-                    raise ValueError(f"ambiguous sourcefile attribution for {source_name!r} in {path}")
-                continue
+            if source_node.findall("line") and not source_classes.get(source_name):
+                raise ValueError(f"unknown sourcefile attribution for {source_name!r} in {path}")
             for line_node in source_node.findall("line"):
-                record_line(lines, package_name, candidates[0], source_name, line_node, path)
+                record_line(lines, package_name, source_name, line_node, path)
     if not lines:
         raise ValueError(f"no line coverage data found in {path}")
-    return lines
+    return lines, class_sources
 
 
-def record_line(lines, package_name, class_name, source_name, node, path):
+def record_line(lines, package_name, source_name, node, path):
+    if not source_name:
+        raise ValueError(f"missing source identity in {path}")
     try:
         line_number = int(node.attrib["nr"])
         covered = int(node.attrib.get("ci", "0")) > 0
@@ -49,18 +54,12 @@ def record_line(lines, package_name, class_name, source_name, node, path):
         raise ValueError(f"invalid line counter in {path}: {error}") from error
     if not (covered or missed):
         return
-    key = (f"{package_name}/{class_name}", line_number)
-    previous = lines.get(key)
-    if previous and previous[0] != source_name:
-        raise ValueError(
-            f"ambiguous source identity for {key[0]}:{line_number}: "
-            f"{previous[0]!r} vs {source_name!r}"
-        )
-    lines[key] = (source_name, covered or (previous[1] if previous else False))
+    key = (f"{package_name}/{source_name}", line_number)
+    lines[key] = covered or lines.get(key, False)
 
 
-def summarize(lines: dict[tuple[str, int], tuple[str, bool]]) -> dict[str, int | float]:
-    covered = sum(1 for _, hit in lines.values() if hit)
+def summarize(lines: dict[tuple[str, int], bool]) -> dict[str, int | float]:
+    covered = sum(lines.values())
     missed = len(lines) - covered
     return {
         "covered": covered,
@@ -81,24 +80,25 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    reports: dict[str, dict[tuple[str, int], tuple[str, bool]]] = {}
+    reports: dict[str, dict[tuple[str, int], bool]] = {}
+    class_sources: dict[str, str] = {}
     try:
         for entry in args.report:
             scope, separator, filename = entry.partition("=")
             if not separator or not scope or not filename or scope in reports:
                 raise ValueError(f"invalid or duplicate report scope: {entry!r}")
-            reports[scope] = parse_report(Path(filename))
+            scope_lines, scope_sources = parse_report(Path(filename))
+            for class_name, source in scope_sources.items():
+                previous = class_sources.get(class_name)
+                if previous and previous != source:
+                    raise ValueError(f"ambiguous source identity for {class_name!r}: {previous!r} vs {source!r}")
+                class_sources[class_name] = source
+            reports[scope] = scope_lines
 
-        merged: dict[tuple[str, int], tuple[str, bool]] = {}
+        merged: dict[tuple[str, int], bool] = {}
         for scope_lines in reports.values():
-            for key, (source, covered) in scope_lines.items():
-                previous = merged.get(key)
-                if previous and previous[0] != source:
-                    raise ValueError(
-                        f"ambiguous source identity for {key[0]}:{key[1]}: "
-                        f"{previous[0]!r} vs {source!r}"
-                    )
-                merged[key] = (source, covered or (previous[1] if previous else False))
+            for key, covered in scope_lines.items():
+                merged[key] = covered or merged.get(key, False)
     except (OSError, ET.ParseError, ValueError) as error:
         print(f"kover-report: {error}", file=sys.stderr)
         return 2

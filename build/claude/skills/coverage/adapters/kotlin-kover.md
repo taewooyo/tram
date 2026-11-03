@@ -57,7 +57,7 @@
    python3 "<plugin-root>/scripts/lib/kover-report.py" --report 'jvm@:koverXmlReport=build/reports/kover/report.xml'
    ```
 
-4. 반환 JSON의 `combined.covered`, `combined.missed`, `combined.total`을 비교 지표로 기록한다. 목표 도달은 원본 라인 수로 비교하고, `combined.percent`는 표시용으로 쓴다. 여러 보고서의 line hit는 합집합 처리해 중복 라인을 한 번만 센다. 파서 실패·빈 데이터·모호한 소스 귀속이면 수치를 추정하지 않고 중단한다. 미실행 위치는 해당 XML의 sourcefile/line 정보를 기존 소스와 대조해 선택한다.
+4. 반환 JSON의 `combined.covered`, `combined.missed`, `combined.total`을 비교 지표로 기록한다. 목표 도달은 원본 라인 수로 비교하고, `combined.percent`는 표시용으로 쓴다. 패키지·소스 파일명·라인 번호를 기준으로 여러 클래스와 보고서의 line hit를 합집합 처리해 중복 라인을 한 번만 센다. 같은 클래스가 서로 다른 소스 파일에 귀속되면 오류로 처리한다. 서로 다른 모듈의 동일 패키지·파일명은 XML만으로 구별할 수 없으므로 같은 소스 범위의 보고서만 합산한다. 파서 실패·빈 데이터·모호한 소스 귀속이면 수치를 추정하지 않고 중단한다. 미실행 위치는 해당 XML의 sourcefile/line 정보를 기존 소스와 대조해 선택한다.
 5. 같은 모듈·task/report·설정·소스 범위로 직전 승인 라운드와 비교한다. 테스트만 바뀌었는데 집계 대상 또는 총 라인 수가 달라지면 원인을 확인하고, 비교 가능성을 확보하지 못하면 라운드를 인정하지 않는다.
 
 ## 변경·체크포인트·종료 연결

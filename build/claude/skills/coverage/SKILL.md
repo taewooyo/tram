@@ -23,6 +23,8 @@ description: 프로젝트 프로필의 명시적 coverage adapter로 테스트 �
 
 어댑터·도구·목표·허용 경로·전체 테스트 명령과 독립 검토 실행을 확보한 뒤 `configure --project PATH --file JSON`으로 `coverage.configured`·`reviewer.configured`와 명령을 확정한다. 신규 프로필 미설정은 실행하지 않는다. 모든 task 명령에 `--project PATH --slug SLUG`를 붙인다. `start --route coverage`와 `transition --action implement`로 진입한다. 각 라운드는 `transition --action verify` 후 `verify-run --command ID`로 전체 테스트·측정 증거를 수집하고 독립 reviewer 결과를 공통 계약의 JSON으로 `review --file JSON`에 등록한다. 코드 5축 리뷰와 아래 coverage 건강도 5차원은 별개다. 실패 라운드는 `transition --action implementation-defect`로 돌아가며 승인된 라운드만 아래 체크포인트 계약을 따른다. 추가 라운드가 필요하면 동일 결함 재진입 행동으로 구현 단계에 돌아가되 원인과 coverage 진행 기록을 구분한다. 최종 목표·종료 조건과 필수 증거가 충족된 경우에만 `transition --action complete`를 실행한다. runtime이 깨끗한 트리·예산·증거 조건을 거부하면 중단하고 보고한다. 거부를 피하려고 제품 변경이나 전체 트리 정리를 하지 않는다.
 
+사용자 요청 범위의 도구·프로필 설정과 임시 측정은 별도 준비 작업으로 수행할 수 있다. 다만 시작 조건과 공식 집계를 충족하기 전에는 coverage 기준선·라운드·목표 달성으로 인정하지 않는다. 준비 작업으로 기존 시작 조건·승인·증거 검사를 우회하지 않는다.
+
 환경 준비는 adapter와 선택한 coverage 어댑터의 환경 검사를 따른다. 커버리지 도구와 대상은 프로젝트 프로필의 `coverage` 설정에서 명시적으로 선택한다.
 
 ## 어댑터 선택
