@@ -29,6 +29,48 @@ def markdown_section(content, heading):
 
 
 class SkillContracts(unittest.TestCase):
+    def test_conversation_collection_keeps_entrypoint_and_decision_boundaries(self):
+        # Structural regression only; scenario execution requires a real agent.
+        prd = read("skills/prd/SKILL.md")
+        branch = prd.split("3. **재료가 거의 없음:**", 1)[1].split("입력이 충분하지", 1)[0]
+        for rule in ("start에서 진입", "같은 대화", "직접 호출", "interview 수집 모드"):
+            self.assertIn(rule, branch)
+        interview = read("skills/interview/SKILL.md")
+        for obsolete in ('"응"만 하면', '"응"만 오면', '**한 번에 하나씩**', '**확인만**'):
+            self.assertNotIn(obsolete, interview)
+        for guard in ("요약 확인 전에 저장하지", "임의로 /prd·Plan·구현으로 넘어가지 않는다"):
+            self.assertIn(guard, interview)
+        policy = read("context/project-experience.md")
+        for boundary in ("데이터 의미", "외부 계약", "쉽게 되돌릴 수 있는", "명확한 동의", "독립적인 질문"):
+            self.assertIn(boundary, policy)
+
+    def test_open_questions_preserve_decision_and_collection_boundaries(self):
+        policy = markdown_section(read("context/project-experience.md"), "## 열린 질문의 능동적 해소")
+        for rule in ("확인 가능한 사실은 조사", "직접 질문", "별도 명령 입력을 요구하지 않는다",
+                     "현재 미승인 PRD", "이미 승인된 PRD·Plan은 덮어쓰지",
+                     "관련 승인·구현을 보류", "무응답을 동의", "읽기 전용 조회",
+                     "추천안을 적극적으로 제안", "장단점·위험", "추천은 사용자 답변과 구분"):
+            self.assertIn(rule, policy)
+        prd = read("skills/prd/SKILL.md")
+        self.assertIn("미결정을 남긴 채 확정을 요청하지 않는다", prd)
+        interview = markdown_section(read("skills/interview/SKILL.md"), "## 호출 흐름 안의 수집 모드")
+        for rule in ("저장 확인 게이트를 추가하지 않는다", "씨앗으로 덮어쓰지 않는다", "독립 interview 호출"):
+            self.assertIn(rule, interview)
+
+    def test_summary_display_preserves_snapshot_and_read_only_boundaries(self):
+        # Instruction boundaries only; real conversation quality is evaluated separately.
+        display = markdown_section(read("context/start-experience.md"), "## 요약·문서 안내")
+        for rule in ("본문과 일치", "이전 승인과 달라진", "명시적 응답 없이", "실제 존재하고 읽을 수 있는",
+                     "아직 생성 전", "생성하지 않는다", "runtime 조회가 정본", "승인 문서에 덧붙이지 않는다",
+                     "문서·로그·marker·잠금을 쓰지 않는다"):
+            self.assertIn(rule, display)
+        for name in ("prd", "plan", "status"):
+            self.assertIn("../../context/start-experience.md#요약문서-안내", read(f"skills/{name}/SKILL.md"))
+        docs = read("context/doc-conventions.md")
+        for boundary in ("승인 전에", "과거 승인 산출물", "바이트 digest", "무단 삭제·공유하지 않는다",
+                         "문서만 복사", "Git 추적이나 공개 허가"):
+            self.assertIn(boundary, docs)
+
     def test_readiness_guidance_preserves_entrypoint_authority(self):
         # Prompt contracts only; this does not establish actual host/LLM behavior.
         guidance = markdown_section(read("context/start-experience.md"),
@@ -112,6 +154,15 @@ class SkillContracts(unittest.TestCase):
         for field in ("effective_phase", "next_action", "approvals_valid", "blocked", "completion_issues"):
             self.assertIn(field, status)
         self.assertRegex(status, r"조회는[^\n]*작업 실행[^\n]*전이[^\n]*로그[^\n]*marker[^\n]*잠금 쓰기를 하지 않는다")
+
+    def test_status_table_preserves_uncertainty_and_route_boundaries(self):
+        status = read("skills/status/SKILL.md")
+        for rule in ("작업 | 진행 상태 | 다음 행동", "항목 | 현재 상태",
+                     "상세 조회 대상을 임의로 선택하지 않는다", "해당 없음",
+                     "미확인", "정상·통과로 추정하지 않는다",
+                     "실제 존재하는 문서만 링크", "원래 오류와 다음 행동",
+                     "기록이나 문서를 생성하지 않는다"):
+            self.assertIn(rule, status)
 
     def test_adoption_finishing_and_document_check_guards(self):
         # Reference and critical instruction regression; not agent-dialogue evidence.

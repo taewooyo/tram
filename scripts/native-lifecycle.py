@@ -507,6 +507,10 @@ class Harness:
                     events.append(value)
             except ValueError:
                 continue
+        if any(event.get("type") == "session_meta" for event in events):
+            raise Blocked("HOST_SESSION_FORMAT_UNSUPPORTED: session_meta/response_item rollout records "
+                          "are not verified command-event streams; task names and parent metadata alone "
+                          "do not prove linked spawn/wait and reviewer command execution")
         sessions = {e.get("thread_id") for e in events if e.get("type") == "thread.started"}
         if len(sessions) != 1:
             raise Blocked("host JSONL did not expose one actual session ID")
@@ -750,6 +754,9 @@ class Harness:
             lines = [json.loads(line) for line in data.decode("utf-8").splitlines() if line.strip()]
         except (ValueError, UnicodeError) as exc:
             raise Blocked("CHILD_HOST_FORMAT_UNSUPPORTED") from exc
+        if any(isinstance(event, dict) and event.get("type") == "session_meta" for event in lines):
+            raise Blocked("CHILD_HOST_FORMAT_UNSUPPORTED: session_meta/response_item rollout records "
+                          "do not provide the supported linked reviewer command-event stream")
         if (not lines or not all(isinstance(event, dict) for event in lines)
                 or lines[0].get("type") != "thread.started" or lines[0].get("thread_id") != child_id):
             raise Blocked("CHILD_HEADER_ID_OR_FORMAT_MISMATCH")
@@ -832,7 +839,10 @@ class Harness:
         parents = [proof for proof in proofs if any(edge.get("child_session") == child_id
                    for edge in proof.get("generic_spawns", []))]
         if len(parents) != 1:
-            raise Blocked("GENERIC_SPAWN_EDGE_UNVERIFIED: CLI child and arbitrary references cannot pass")
+            raise Blocked("GENERIC_SPAWN_EDGE_UNVERIFIED: expected completed collab_tool_call spawn/wait "
+                          "events with parent/child UUIDs; task-name-only spawn results and "
+                          "session_meta/response_item rollout records are unsupported; "
+                          "CLI child and arbitrary references cannot pass")
         child = self.generic_child(stack, parents[0], child_id)
         if (not child or review.get("fresh") is not True or review.get("verdict") != "pass"
                 or review.get("snapshot") != snapshot or child["session"] == implementation

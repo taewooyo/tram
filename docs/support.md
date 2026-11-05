@@ -15,6 +15,8 @@
 
 Codex에서는 설치된 Tram의 `init`·`start`·`status` 스킬을 명시해 요청한다. Claude Code 연결부의 호출 표기는 `/tram:init`, `/tram:start`, `/tram:status`다. 단축 입력 구문은 호스트에서 확인해야 한다. 설치와 갱신은 [설치 안내](setup.md)를 따른다.
 
+실제 CLI 기록 형식과 검증 도구의 지원 형식은 별개다. 현재 native lifecycle 검증기는 `collab_tool_call`의 부모·자식 UUID spawn/wait와 연결된 reviewer 명령 이벤트 스트림을 요구한다. 작업 이름만 반환하는 spawn 결과 및 `session_meta`·`response_item` rollout 기록은 해당 증거 어댑터에서 미지원으로 진단한다. 로컬 기록에 부모 메타데이터나 runtime 리뷰가 있어도 이 연결 검사를 대신하지 않으며, 전체 native lifecycle 통과로 확대하지 않는다.
+
 ## 기능별 실행 조건
 
 | 기능 | 조건과 제한 |

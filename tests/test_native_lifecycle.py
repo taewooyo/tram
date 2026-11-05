@@ -547,6 +547,31 @@ class NativeLifecycleTests(unittest.TestCase):
         other = self.h.collect_native("python", self.jsonl(session, events), "parent")
         self.assertEqual(other["generic_spawns"], [])
 
+    def test_rollout_metadata_is_diagnosed_without_accepting_a_spawn_edge(self):
+        self.fixture_case()
+        parent = self.h.state["sessions"]["python"]
+        child = str(uuid.uuid4())
+        # Sanitized observed record shape; no private prompts or account metadata.
+        events = [
+            {"type": "session_meta", "payload": {"id": child,
+                "parent_thread_id": parent, "agent_path": "/root/reviewer"}},
+            {"type": "response_item", "payload": {"type": "function_call",
+                "name": "spawn_agent", "call_id": "spawn-call",
+                "arguments": json.dumps({"task_name": "reviewer"})}},
+            {"type": "response_item", "payload": {"type": "function_call_output",
+                "call_id": "spawn-call", "output": json.dumps({"task_name": "/root/reviewer"})}},
+            {"type": "event_msg", "payload": {"type": "task_complete"}},
+        ]
+        with self.assertRaisesRegex(native.Blocked, "HOST_SESSION_FORMAT_UNSUPPORTED.*spawn/wait"):
+            self.h.collect_native("python", "\n".join(map(json.dumps, events)), "unsupported-rollout")
+        self.assertFalse(self.h.state.get("native_lifecycle_complete"))
+        self.assertNotIn("native_evidence", self.h.state)
+
+    def test_missing_spawn_edge_explains_task_name_format_limit(self):
+        self.completion_case()
+        with self.assertRaisesRegex(native.Blocked, "GENERIC_SPAWN_EDGE_UNVERIFIED.*task-name-only"):
+            self.h.completion("python")
+
     def test_generic_structured_wait_report_remains_attestation_only(self):
         self.fixture_case()
         session = self.h.state["sessions"]["python"]
@@ -599,11 +624,12 @@ class NativeLifecycleTests(unittest.TestCase):
         path.unlink()
         with self.assertRaisesRegex(native.Blocked, "CHILD_HOST_RECORD_MISSING"):
             self.h.completion("python")
-        for header in ({"type": "session_meta", "payload": {}},
-                       {"type": "thread.started", "thread_id": str(uuid.uuid4())}):
+        for header, error in (({"type": "session_meta", "payload": {}}, "CHILD_HOST_FORMAT_UNSUPPORTED.*rollout"),
+                              ({"type": "thread.started", "thread_id": str(uuid.uuid4())},
+                               "CHILD_HEADER_ID_OR_FORMAT_MISMATCH")):
             path.write_text(text)
             self.rewrite_child(path, lambda lines: lines.__setitem__(0, header), proof)
-            with self.assertRaisesRegex(native.Blocked, "CHILD_HEADER_ID_OR_FORMAT_MISMATCH"):
+            with self.assertRaisesRegex(native.Blocked, error):
                 self.h.completion("python")
         path.write_text("not-json\n")
         self.refresh_window(proof)

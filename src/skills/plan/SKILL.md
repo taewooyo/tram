@@ -6,6 +6,8 @@ description: 확정된 PRD를 바탕으로 메인이 직접 또는 위험·비�
 
 실행 주체는 [단일 오케스트레이션 계약](../../context/start-experience.md)의 직접 수행·위임 기준을 따른다. 아래 작업자 절차는 위임 시 적용하며 각 경로의 독립 검토·안전판은 유지한다.
 
+새 승인 산출물의 읽기 구조는 [문서 규칙](../../context/doc-conventions.md)을, 승인 요약·재승인·문서 안내는 [공통 표시 정책](../../context/start-experience.md#요약문서-안내)을 따른다.
+
 ## 실행 경계
 
 현재 스킬 파일의 `../..`를 plugin root로 해석하고 `<plugin-root>/adapter.md`, [공통 실행 계약](../../context/runtime-contract.md), [작업 시작·재개의 사용자 경험](../../context/start-experience.md), [프로젝트 경험](../../context/project-experience.md)을 먼저 읽는다. start에서 수집한 현재 동작·제약과 기존 지식 조사를 재사용하되, 승인된 PRD 이후의 재활용 코드 조사와 구현 설계는 이 단계에서 수행한다. 문서나 코드가 충돌하면 승인된 의도로 추정하지 말고 설계 선택이 필요한 내용만 보고한다. 대상 프로젝트는 사용자 지정 경로로 명시하며 plugin root와 혼동하지 않는다. 문서·명령의 상대 경로와 셸 cwd는 대상 프로젝트 기준이다. `<plugin-root>` 표기는 해석한 실제 경로로 치환하고 셸 경로는 인용한다. Native 도구·독립 검토 호출은 adapter를 따른다.
