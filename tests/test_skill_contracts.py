@@ -29,6 +29,33 @@ def markdown_section(content, heading):
 
 
 class SkillContracts(unittest.TestCase):
+    def test_observation_integration_preserves_runtime_and_read_only_boundaries(self):
+        # Instruction contracts only; runtime/host behavior is tested separately.
+        target = "../../context/start-experience.md#작업별-검증과-정책-관찰"
+        for name in ("init", "start", "status", "impl", "quick", "verify"):
+            with self.subTest(skill=name):
+                self.assertIn(target, read(f"skills/{name}/SKILL.md"))
+        contract = markdown_section(read("context/runtime-contract.md"),
+                                    "## 선택형 하네스 관찰 계약")
+        for boundary in ("기존 runtime이 정본", "mode: observe", "기존 required는 항상 포함",
+                         "source: caller_reported", "reported_pass", "storage_digest",
+                         "요청·범위를 확보하지 못하면", "완료 판정을 덮어쓰지 않는다",
+                         "디렉터리·잠금·Task·marker·metrics도 만들지 않는다"):
+            self.assertIn(boundary, contract)
+        for diagnostic in ("VERIFICATION_RESULT_MISSING", "VERIFICATION_RESULT_INVALID",
+                           "HUMAN_REVIEW_PENDING", "REQUIRED_CHECK_OMISSION_PROPOSED"):
+            self.assertIn(diagnostic, contract)
+        status = read("skills/status/SKILL.md")
+        self.assertIn("show로만 읽을 수", status)
+        self.assertIn("search·recommend·record·configure나 새 지식 조사를 시작하지 않는다", status)
+        flow = markdown_section(read("context/start-experience.md"),
+                                "## 작업별 검증과 정책 관찰")
+        self.assertIn("관찰 기록은 작업 메모이며 승인·증거·별도 상태 엔진이 아니다", flow)
+        self.assertIn("실제 호스트 행동·속도 개선의 증거가 아니다", contract)
+        knowledge = read("context/project-experience.md")
+        self.assertIn("기존 매핑의 우선순위와 명시적 빈 설정을 존중", knowledge)
+        self.assertIn("정책 없음이 아니라 미확인", knowledge)
+
     def test_conversation_collection_keeps_entrypoint_and_decision_boundaries(self):
         # Structural regression only; scenario execution requires a real agent.
         prd = read("skills/prd/SKILL.md")

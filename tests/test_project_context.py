@@ -12,6 +12,27 @@ SCRIPT = ROOT / "src/scripts/project-context.py"
 
 
 class ProjectContextCli(unittest.TestCase):
+    def test_optional_policy_search_preserves_explicit_empty_mapping(self):
+        runtime = ROOT / "src/runtime/tram.py"
+        result = subprocess.run([sys.executable, str(runtime), "init", "--project", str(self.root)],
+                                capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        folder = self.root / "docs/domain"
+        folder.mkdir(parents=True)
+        (folder / "legacy.md").write_text("로그인 정책", encoding="utf-8")
+        (folder / "_territory.tsv").write_text("app/* legacy\n", encoding="utf-8")
+        before = self.call("knowledge", "--path", "app/login.py")["result"]
+        self.assertEqual(before["profile_state"], "empty")
+        self.assertEqual(before["matches"], [])
+        profile = self.root / ".tram/project.json"
+        profile_before = (profile.read_bytes(), profile.stat().st_mtime_ns)
+        search = subprocess.run([sys.executable, str(ROOT / "src/scripts/harness.py"), "search",
+                                 "--project", str(self.root), "--query", "로그인", "--path", "app/login.py"],
+                                capture_output=True, text=True)
+        self.assertEqual(search.returncode, 0, search.stdout + search.stderr)
+        self.assertEqual(profile_before, (profile.read_bytes(), profile.stat().st_mtime_ns))
+        self.assertEqual(before, self.call("knowledge", "--path", "app/login.py")["result"])
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)

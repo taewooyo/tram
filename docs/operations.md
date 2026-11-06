@@ -63,6 +63,29 @@ python3 "<Tram 루트>/runtime/tram.py" doctor --project "<프로젝트 경로>"
 
 `metrics task-close`·`metrics resume-close`는 실제 사용자 중단·실패 마감의 reference와 이유 코드가 있을 때만 사용한다. 로컬 평가상의 마감은 task phase·승인·완료를 바꾸지 않는다. `question-assessment`는 질문 원문 없이 necessary/unnecessary/unknown과 근거 유형·자료 경로만 기록한다. `metrics prune|purge`와 수동 평가·마감은 명시적 쓰기다. 반복 start는 진행 전 pending 재개를 중복 생성하지 않는다.
 
+## 작업별 검사·정책 관찰
+
+에이전트에게 기존처럼 Tram으로 작업을 요청하면 현재 요청과 변경 경로를 바탕으로 필요한 검사와 정책 후보를 확인할 수 있다. 관찰 기능은 선택 사항이다. 설정이 없거나 검색하지 못한 부분은 미확인으로 설명하며, 기존 필수 검사·승인·독립 검토·완료 조건은 그대로 적용한다. 사용자가 매번 검사 전체를 선택하거나 새 단계 명령을 입력할 필요는 없다.
+
+보조 설정은 `.tram/harness.json`, 작업별 참고 기록은 `.tram/local/harness/<slug>/`다. 보조 설정은 `mode: observe`만 허용하고 기존 profile의 command ID에 설명·경로·키워드·결과 기대 여부를 연결한다. 기존 argv·required를 다시 정의하지 않는다. 초기 설정은 에이전트가 프로젝트 자료를 조사해 제안하며 확정할 수 없는 정책만 질문한다. 명령 실행 권한이나 제품 정책 승인을 예시 설정으로 대신하지 않는다.
+
+설치본에서 `python3 "<Tram 루트>/scripts/harness.py" contract`와 해당 하위 명령의 `--help`로 정확한 입력을 확인한다. 설정 변경은 configure, 관찰 저장은 record만 수행하며 예상 revision/digest로 동시 변경을 검사한다. 최초 설정은 `--expected-revision 0 --expected-digest missing`, 최초 관찰 기록은 `--expected-digest missing`을 사용한다. 이후 실제 조회의 revision·digest를 사용하고 JSON 직접 덮어쓰기나 ignore 자동 변경으로 충돌을 우회하지 않는다.
+
+| 확인할 내용 | 내부 조회 | 해석 |
+| --- | --- | --- |
+| 작업별 검사 후보 | recommend에 slug·현재 request·변경 path 전달 | 필수 검사는 항상 포함, 나머지 선택·제외 이유와 미확인 영향 확인 |
+| 관련 정책 | 기존 knowledge와 search에 query·관련 path 전달 | 실제 문서를 읽고 출처·확인 시점·대체 관계·검색 잘림 확인 |
+| 재개 시 참고 기록 | show에 slug와 가능한 현재 request/path 전달 | 코드·설정·범위 변경은 stale, 현재 요청 미확보는 unknown |
+| 고정 사례 평가 | evaluate에 명시 fixture 파일 전달 | 정답 label 대비 추천·검색·해석 결과이며 실제 호스트 E2E 증거가 아님 |
+
+runtime의 실행 성공, caller_reported 선언, 사람 판정 대기, 미실행을 구분한다. 유효한 실행에 연결된 통과 선언도 reported_pass이며 선언한 scope가 실제 테스트 범위를 증명하지 않는다. 필수 건수 기준이 있는 검사는 건수 누락·타입 오류·미달을 통과 선언으로 인정하지 않는다. 화면 비교 리포트 생성은 사람 판정이나 화면 검증 통과 자체가 아니다.
+
+관찰의 `VERIFICATION_RESULT_MISSING`·`VERIFICATION_RESULT_INVALID`·`HUMAN_REVIEW_PENDING`·`REQUIRED_CHECK_OMISSION_PROPOSED`는 참고 경고다. 이를 실행 성공으로 바꾸거나 기존 verify-run의 exit/errorCode를 덮어쓰지 않는다. 구조화 결과를 제공하지 않는 기존 명령은 기존 계약대로 실행·판정하고 관찰 범위만 unknown으로 설명한다. 기존 runtime에서 필수 검사 누락으로 차단된 완료를 관찰 도구로 허용할 수 없다.
+
+contract/recommend/search/show/evaluate는 읽기 전용이며 조회 중 파일·잠금·Task·metrics를 만들지 않는다. status에서는 저장된 show만 읽고 search·recommend·record·configure나 새 정책 조사를 시작하지 않는다. 저장 실패는 원인과 다음 행동을 알리고 기존 runtime 결과를 보존한다. 보조 기능을 중단할 때는 호출을 비활성화하고 기록을 보존한다. 기존 profile/task·승인·증거를 지우거나 migration할 필요가 없다.
+
+완료 시간·개입·검증 시간·재개·검사 누락·후속 결함은 관측 자료와 정의가 있을 때만 보고한다. 기존 metrics와 고정 사례를 활용하며 미측정은 0 대신 null/미측정이다. 실제 호스트 비교는 동일 시작 코드·요청·호스트·모델·권한 및 후보 식별자를 남겨 수행하고, 정적 계약·fixture 결과를 실제 행동·속도 개선으로 확대하지 않는다.
+
 ## 실제 호스트와 공개 준비
 
 현재 Codex·Claude Code용 공개 alpha 준비 중이며 전체 native lifecycle은 미검증이다. 로컬 제거·재설치는 Git upgrade 성공 증거가 아니다. 실제 호스트에서 새 세션 재개·업데이트·제거·복귀와 기존 변경·기록 보존을 확인해야 한다. 검증용 fixture에서도 PRD·Plan의 실제 승인은 각각 필요하며 다른 작업 승인을 재사용하지 않는다. 사용자 인증 복사·전역 trust 자동 변경은 하지 않는다.

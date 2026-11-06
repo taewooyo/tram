@@ -5,6 +5,8 @@ description: Tram 작업 단계·승인 유효성·검증·제한·다음 행동
 
 # 진행 상태 조회
 
+[작업별 검증과 정책 관찰](../../context/start-experience.md#작업별-검증과-정책-관찰)의 status 경계를 따른다. 명시한 작업의 저장 관찰은 show로만 읽을 수 있으며 현재 요청을 모르면 해당 추천 유효성은 미확인이다. 이 조회에서 search·recommend·record·configure나 새 지식 조사를 시작하지 않는다. runtime 상태와 관찰 참고 정보를 구분한다.
+
 현재 스킬 파일의 `../..`를 plugin root로 해석하고 `<plugin-root>/adapter.md`와 [공통 실행 계약](../../context/runtime-contract.md)과 [작업 시작·재개의 사용자 경험](../../context/start-experience.md)을 읽는다. 대상 프로젝트를 명시한다.
 
 메인이 직접 `python3 "<plugin-root>/runtime/tram.py" status --project "<target>"`를 실행한다. 특정 작업은 `--slug "<slug>"`를 붙인다. 여러 작업이 있으면 식별 가능한 목록을 보여주고 재개 대상을 임의로 정하지 않는다.

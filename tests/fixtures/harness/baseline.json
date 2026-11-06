@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "kind": "recommendation",
+      "commands": [
+        {"id": "unit", "required": true, "confirmed": true},
+        {"id": "ui", "required": false, "confirmed": true}
+      ],
+      "checks": {"ui": {"keywords": ["화면"], "paths": ["screens/**"]}},
+      "request": "화면 문구 변경",
+      "paths": ["screens/home.py"],
+      "expected": ["unit", "ui"]
+    }
+  ]
+}

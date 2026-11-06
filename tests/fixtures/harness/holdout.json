@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "kind": "recommendation",
+      "commands": [
+        {"id": "contract", "required": true, "confirmed": true},
+        {"id": "integration", "required": false, "confirmed": true},
+        {"id": "visual", "required": false, "confirmed": false}
+      ],
+      "checks": {"integration": {"keywords": ["인증"], "paths": ["server/auth/**"]}},
+      "request": "토큰 인증 정책 점검",
+      "paths": ["server/auth/session.js"],
+      "expected": ["contract", "integration"]
+    },
+    {
+      "kind": "recommendation",
+      "commands": [{"id": "contract", "required": true, "confirmed": true}],
+      "checks": {},
+      "request": "문서 설명 변경",
+      "paths": ["README.md"],
+      "expected": ["contract"]
+    }
+  ]
+}

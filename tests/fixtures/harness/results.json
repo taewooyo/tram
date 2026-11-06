@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "kind": "result",
+      "slug": "sample",
+      "input": {
+        "schema_version": 1,
+        "kind": "result",
+        "command_id": "unit",
+        "run_id": null,
+        "outcome": "not_run",
+        "reason": "검증 환경 미준비",
+        "declared_scope": [],
+        "limitations": []
+      },
+      "expected": "not_run"
+    }
+  ]
+}

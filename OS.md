@@ -25,6 +25,8 @@ prd는 무엇·왜를 수집·정제하고 선택적 interview는 같은 PRD 경
 
 verify-run은 선택한 프로젝트 검증 명령을 직접 실행한다. 검증 뒤 코드·문서가 달라지면 낡은 증거로 완료할 수 없다. full은 독립 reviewer가 필요하며 자체 검토로 대체하지 않는다. 독립 재채점·min-gate·예산·막힘 가드의 상세는 [impl](src/skills/impl/SKILL.md)·[verify](src/skills/verify/SKILL.md)·[루브릭](src/context/review-rubric.md)을 따른다. complete는 구현·검증 완료이며 원격 마무리는 별도다.
 
+프로젝트별 선택형 관찰 도구는 현재 요청과 변경 범위에 맞는 검사·정책 후보와 선언 결과의 한계를 설명한다. 기존 필수 검사·승인·독립 검토·완료 판정은 유지하며 플랫폼별 도구는 기존 프로젝트 명령에 연결한다. 시작·재개·조회 연결은 [작업별 검증과 정책 관찰](src/context/start-experience.md#작업별-검증과-정책-관찰), 정확한 입력과 읽기·쓰기 경계는 [관찰 계약](src/context/runtime-contract.md#선택형-하네스-관찰-계약)을 따른다.
+
 ## 전문 경로와 받침 도구
 
 - quick: 작은 저위험 변경, 위험 감별·동작 변경 테스트·verify light. 커지면 풀 흐름으로 돌아간다.
@@ -43,7 +45,7 @@ verify-run은 선택한 프로젝트 검증 명령을 직접 실행한다. 검�
 | 에이전트 연결 | platform/{codex,claude}의 adapter·manifest·hooks |
 | 생성 배포본 | build/{codex,claude}의 자체 완결 패키지; 직접 편집 금지 |
 | 작업용 생성 뷰 | .codex/는 inventory에 기록된 경로를 동기화; 목록 밖 legacy 파일은 보존 |
-| 대상 프로젝트 | .tram/project.json·installation.json·tasks/<slug>.json·.tram/local/와 프로젝트 문서 |
+| 대상 프로젝트 | .tram/project.json·installation.json·tasks/<slug>.json·선택형 harness.json·.tram/local/와 프로젝트 문서 |
 
 plugin root와 project root는 분리한다. 프로젝트 기록에 cache 절대 경로를 저장하지 않는다. AGENTS.md·CLAUDE.md는 관리 block만 연결하며 사용자 본문·수정·손상 block을 보존한다. 설치·업데이트·본체 제거는 native plugin manager를 사용한다. 프로젝트 unlink 후 .tram/·문서·로컬 로그 제외 규칙을 보존한다.
 

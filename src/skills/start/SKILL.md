@@ -8,6 +8,8 @@ description: Tram 작업을 위험도에 맞게 시작하거나 재개하고 PRD
 
 # 작업 시작·재개
 
+[작업별 검증과 정책 관찰](../../context/start-experience.md#작업별-검증과-정책-관찰)에 따라 현재 요청·변경 경로로 검사 추천과 관련 정책 후보를 확인한다. 재개 시 현재 요청을 show에 전달하거나 새 recommend를 수행하며, 미확보 요청의 과거 추천을 유효하다고 단정하지 않는다. 선택·제외 이유를 다음 역할에 전달하고 기존 필수 검사와 승인 게이트를 유지한다.
+
 현재 스킬 파일의 `../..`를 plugin root로 해석하고 `<plugin-root>/adapter.md`, [공통 실행 계약](../../context/runtime-contract.md), [작업 시작·재개의 사용자 경험](../../context/start-experience.md), [프로젝트 경험](../../context/project-experience.md)을 읽는다. 대상 프로젝트와 작업 slug를 식별한다. 여러 작업 중 최신 작업을 임의 선택하지 않는다.
 
 1. 사용자 요청·현재 대화·기존 기록에서 project·slug를 먼저 확인한다. 인자가 없어도 확인한 사실을 재질문하지 않는다. 대상이 유일하지 않으면 후보와 상태를 보여주고 선택 전 실행하지 않는다. 메인은 대상 선택과 runtime 조회를 맡는다. 조사 작업자는 코드를 조사하거나 init/PRD 산출물을 쓰기 전에 `python3 "<plugin-root>/scripts/project-context.py" workspace --project "<target>"`로 현재 브랜치·HEAD와 기존 변경을 먼저 확인한다. 대상 경로가 정해졌으면 `--path`를 전달해 충돌 범위만 살펴본다. 조사 결과를 받은 메인은 runtime status로 `effective_phase`·`next_action`·`approvals_valid`·차단 이유와 현재 문서·기록을 대조한다. 미연결이면 [init](../init/SKILL.md)을 먼저 수행한다.

@@ -33,6 +33,12 @@ class PackageSmokeTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         return json.loads(result.stdout)["result"]
 
+    def observe(self, package, project, *args):
+        result = subprocess.run([sys.executable, str(package / "scripts/harness.py"),
+                                 *args, "--project", str(project)], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        return json.loads(result.stdout)["result"]
+
     def test_both_packages_ship_provenance_and_complex_plan_contracts(self):
         for host in ("codex", "claude"):
             with self.subTest(host=host):
@@ -127,6 +133,18 @@ class PackageSmokeTests(unittest.TestCase):
                         "cwd": ".", "confirmed": True, "required": True}]}))
                     self.call(package, project, "configure", "--file", str(config))
                     self.call(package, project, "start", "--slug", "smoke", "--route", "quick")
+                    # Optional observation must not mutate task/profile or weaken gates.
+                    before_observation = self.call(package, project, "status", "--slug", "smoke")
+                    tracked = [project / ".tram/project.json", project / ".tram/tasks/smoke.json"]
+                    old_bytes = [(p.read_bytes(), p.stat().st_mtime_ns) for p in tracked]
+                    recommendation = self.observe(package, project, "recommend", "--slug", "smoke",
+                                                  "--request", "작은 문구 변경", "--omit", "test")
+                    self.assertIn("REQUIRED_CHECK_OMISSION_PROPOSED", json.dumps(recommendation))
+                    self.observe(package, project, "show", "--slug", "smoke")
+                    self.assertEqual(old_bytes, [(p.read_bytes(), p.stat().st_mtime_ns) for p in tracked])
+                    after_observation = self.call(package, project, "status", "--slug", "smoke")
+                    self.assertEqual(before_observation["completion_issues"], after_observation["completion_issues"])
+                    self.assertEqual(before_observation["snapshot"], after_observation["snapshot"])
                     self.call(package, project, "transition", "--slug", "smoke", "--action", "verify")
                     evidence = self.call(package, project, "verify-run", "--slug", "smoke", "--command", "test")
                     self.assertEqual(evidence["exit_code"], 0)

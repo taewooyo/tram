@@ -8,6 +8,8 @@ description: Tram을 명시한 프로젝트에 연결하고 스택·검증 후�
 
 # 프로젝트 연결
 
+[작업별 검증과 정책 관찰](../../context/start-experience.md#작업별-검증과-정책-관찰)의 init 연결을 적용한다. 기존 명령 확정 뒤 필요한 관찰 설정을 같은 대화에서 제안하고, 선택한 경우에만 보조 configure로 저장한다. 관찰 설정 부재는 기존 연결·작업의 필수 차단 조건이 아니다.
+
 현재 스킬 파일의 `../..`를 plugin root로 해석하고 `<plugin-root>/adapter.md`, [공통 실행 계약](../../context/runtime-contract.md), [단일 오케스트레이션 계약](../../context/start-experience.md), [프로젝트 경험 규칙](../../context/project-experience.md)을 읽는다. 메인이 대상 프로젝트의 실제 경로를 확인하고 조사 작업자를 배정한다. 작업자는 가능하면 `python3 "<plugin-root>/scripts/project-context.py" workspace --project "<target>"`로 Git·dirty·unborn 상태를 확인한다. init은 프로젝트 파일을 변경할 수 있으므로 기존 설정과 충돌하는 변경을 보존한다.
 
 메인이 `python3 "<plugin-root>/runtime/tram.py" init --project "<target>"`을 실행한다. 조사 작업자는 스택·검증 후보·컨벤션을 실제 소스와 설정에 대조해 후보 델타와 근거를 반환한다. 메인이 프로필을 선택하고 근거로 확정할 수 없는 선택만 질문한다. 후보 발견을 명령 실행 권한으로 간주하지 않는다. 기존 사용자 설정과 관리 block 충돌은 보존하고 해결 사항을 보고한다.

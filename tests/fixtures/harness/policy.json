@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "kind": "search",
+      "query": "스크린샷 업로드",
+      "paths": ["code.py"],
+      "expected": ["docs/knowledge/fixture-policy.md"]
+    }
+  ]
+}

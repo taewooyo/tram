@@ -13,6 +13,8 @@ description: 승인된 Plan대로 구현하고, /verify를 호출해 판정을 �
 
 # /impl — 빌드 디스패처 (구현 ⇄ /verify 루프 제어)
 
+[작업별 검증과 정책 관찰](../../context/start-experience.md#작업별-검증과-정책-관찰)에 따라 시작 시 받은 추천·정책 근거를 재사용한다. 변경 범위가 확대되면 관련 추천과 정책 입력을 재평가하고, 참고 결과는 실제 verify-run 기록과 구분한다. 관찰 선택으로 기존 필수 검사·full 독립 검토·완료 조건을 생략하지 않는다.
+
 ## 런타임 기록
 
 명시한 project·slug로 `status`를 확인하고 `transition --action implement`가 성공해야 구현한다. 문서 표식만으로 승인 기록을 대신하지 않는다. 모든 task 명령에 `--project PATH --slug SLUG`를 붙인다. 구현 후 메인이 `transition --action verify --strength light|full`로 라운드를 열고 light는 메인이 직접 `verify-run` 검사·판정을 수행하거나 위임하고 full은 fresh reviewer에게 맡긴다. full 리뷰는 메인이 검산한 뒤 `review`로 등록한다. 판정을 받은 이 디스패처가 통과 시 `transition --action complete`, 구현결함 시 `transition --action implementation-defect`, 설계문제 시 `transition --action design-problem`(요구 변경이면 `requirements-problem`)을 실행한다. 거부·낡은 증거·라운드 상한은 보고하고 완료를 주장하지 않는다. 다음 라운드는 새 독립 검토를 받는다. 구현 루프는 기본 라운드 예산·정체 가드를 유지하며 `--manual-full-continuation`을 전달하지 않는다.
