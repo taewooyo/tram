@@ -52,6 +52,15 @@ class SkillContracts(unittest.TestCase):
         for host in ("codex", "claude"):
             self.assertIn("context/user-questions.md", (ROOT / "platform" / host / "adapter.md").read_text())
 
+    def test_push_and_retro_hook_prerequisites_are_explicit(self):
+        push = read("skills/push/SKILL.md")
+        self.assertIn("hook의 사전 조건을 확인", push)
+        self.assertIn("단순히 푸시하기 위한 우회는 하지 않는다", push)
+        retro = read("skills/retro/SKILL.md")
+        self.assertIn("현재 호출이 로그에 자동 기록됐는지 확인한다", retro)
+        self.assertIn("로그를 직접 만들거나 과거 시각을 기록하지 않으며", retro)
+        self.assertIn("저장소가 문서화한 복구 경로만 따른다", retro)
+
     def test_observation_integration_preserves_runtime_and_read_only_boundaries(self):
         # Instruction contracts only; runtime/host behavior is tested separately.
         target = "../../context/start-experience.md#작업별-검증과-정책-관찰"

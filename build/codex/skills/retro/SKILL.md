@@ -52,6 +52,7 @@ description: 방금 세션을 두 렌즈로 회고해 개선 제안을 사용자
    if [ ! -f "$LOG" ]; then LOG=".codex/skill-usage.log"; fi  # legacy는 조회만 한다.
    test -f "$LOG" && tail -n 40 "$LOG" | cut -f2 | sort | uniq -c | sort -rn
    ```
+   저장소 hook이 최근 `retro` 사용 기록을 요구하면 회고 완료 뒤 현재 호출이 로그에 자동 기록됐는지 확인한다. 로그를 직접 만들거나 과거 시각을 기록하지 않으며, 기록되지 않았다면 실제 회고를 생략하지 말고 저장소가 문서화한 복구 경로만 따른다.
 3. **손댄 도메인** — 자료 작업자가 조사한다. 이번에 **편집한 코드 파일** 각각을 `project-context.py knowledge`에 전달해 profile territories와 legacy 후보를 함께 확인한다. profile이 없을 때만 legacy TSV가 적용되고, profile이 존재하면 우선하며 빈 배열은 매핑 없음으로 유지한다. 도구의 `matches`, `legacy_candidates`, `conflicts`, `missing`, `warnings`를 사실 그대로 브리프에 담는다:
    ```bash
    python3 "<plugin-root>/scripts/project-context.py" knowledge --project "<project-root>" --path "<편집한 코드 경로>"
