@@ -6,7 +6,7 @@
 
 | 대상 | 확인한 범위 | 남은 확인 |
 |---|---|---|
-| Codex | 실제 CLI 0.166.0의 격리 로컬 marketplace 등록·설치·제거·재설치와 파일별 동일성 확인; 이전 CLI 일부 대화·자동 패키지 회귀 | 공개 Git 설치·Desktop UI·전체 작업 및 재개 lifecycle |
+| Codex | 실제 CLI 0.166.0의 격리 로컬 marketplace 등록·설치·제거·재설치와 파일별 동일성 확인; 현재 후보의 격리 clean install 회귀; 활성 대화에서 native 질문 카드·응답 및 1 of 2 이동을 사용자 확인 | 공개 Git 설치·Desktop UI 전체 작업 및 재개 lifecycle; 별도 task에서 native 질문 호출 |
 | Claude Code | 실제 CLI 2.1.92의 manifest 검사·격리 로컬 marketplace 등록·설치·제거·재설치와 파일별 동일성 확인; 패키지·fixture 검사 | 로그인된 실제 작업·승인·재개와 공개 Git 설치·업데이트 |
 | Linux | 자동 검사 대상 | 실제 native 호스트 결과 |
 | Windows/WSL·Grok | 지원 검증 없음 | 이번 alpha 범위 밖 |
@@ -14,6 +14,8 @@
 사용자의 Android 프로젝트 연결·Gradle 성공 보고는 해당 관찰에 한정한다. Android 전체 기능 흐름·Kover·훅 검증으로 확대하지 않는다. 같은 버전 표시만으로 설치된 파일이 현재 후보와 같다고 판단하지 않는다. `release.json`의 `validationTargets`는 목표이며 `validatedHosts`만 수집한 호스트 증거 목록이다.
 
 Codex에서는 설치된 Tram의 `init`·`start`·`status` 스킬을 명시해 요청한다. Claude Code 연결부의 호출 표기는 `/tram:init`, `/tram:start`, `/tram:status`다. 단축 입력 구문은 호스트에서 확인해야 한다. 설치와 갱신은 [설치 안내](setup.md)를 따른다.
+
+구조화 질문은 현재 호스트와 모드가 제공하는 도구를 우선 사용하도록 지시한다. 지원 여부·옵션 형식·화면은 호스트에 따라 다르며, 도구를 사용할 수 없거나 호출에 실패하면 대화로 질문한다. 현재 Codex 활성 대화에서는 native 질문 카드와 답변 전달, 사용자가 확인한 `1 of 2` 진행 표시·이동을 검증했다. 별도 Codex task가 구조화 질문 도구 대신 텍스트로 질문한 관찰도 있어 task 간 동작은 보장하지 않는다. Claude의 실제 질문 화면·응답은 아직 미검증이다.
 
 실제 CLI 기록 형식과 검증 도구의 지원 형식은 별개다. 현재 native lifecycle 검증기는 `collab_tool_call`의 부모·자식 UUID spawn/wait와 연결된 reviewer 명령 이벤트 스트림을 요구한다. 작업 이름만 반환하는 spawn 결과 및 `session_meta`·`response_item` rollout 기록은 해당 증거 어댑터에서 미지원으로 진단한다. 로컬 기록에 부모 메타데이터나 runtime 리뷰가 있어도 이 연결 검사를 대신하지 않으며, 전체 native lifecycle 통과로 확대하지 않는다.
 

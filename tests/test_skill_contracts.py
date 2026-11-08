@@ -29,6 +29,18 @@ def markdown_section(content, heading):
 
 
 class SkillContracts(unittest.TestCase):
+    def test_guided_onboarding_and_native_question_contracts(self):
+        questions = read("context/user-questions.md")
+        for boundary in ("실제 도구로 질문", "추천 선택지를 먼저", "자유롭게 입력", "의존하는 질문", "필요한 자유 입력을 지원하지", "일반 대화", "별개", "명시적 응답"):
+            self.assertIn(boundary, questions)
+        onboarding = read("context/project-onboarding.md")
+        for boundary in ("심화 조사를 권장", "staged 삭제", "사용자가 승인한 범위만", "fresh 독립 reviewer", "미결정", "기존 runtime"):
+            self.assertIn(boundary, onboarding)
+        self.assertIn("project-onboarding.md", read("skills/init/SKILL.md"))
+        self.assertIn("user-questions.md", read("context/runtime-contract.md"))
+        for host in ("codex", "claude"):
+            self.assertIn("context/user-questions.md", (ROOT / "platform" / host / "adapter.md").read_text())
+
     def test_observation_integration_preserves_runtime_and_read_only_boundaries(self):
         # Instruction contracts only; runtime/host behavior is tested separately.
         target = "../../context/start-experience.md#작업별-검증과-정책-관찰"
