@@ -31,11 +31,22 @@ def markdown_section(content, heading):
 class SkillContracts(unittest.TestCase):
     def test_guided_onboarding_and_native_question_contracts(self):
         questions = read("context/user-questions.md")
-        for boundary in ("실제 도구로 질문", "추천 선택지를 먼저", "자유롭게 입력", "의존하는 질문", "필요한 자유 입력을 지원하지", "일반 대화", "별개", "명시적 응답"):
+        for boundary in ("실제 도구로 질문", "추천 선택지를 먼저", "자유롭게 입력", "의존하는 질문", "필요한 자유 입력을 지원하지", "일반 대화",
+                         "도구 접수·실제 화면 표시·사용자의 응답은 별개", "실제 확인하지 않은 화면 표시와 응답을 성공으로 보고하지 않는다",
+                         "명시적 응답"):
             self.assertIn(boundary, questions)
         onboarding = read("context/project-onboarding.md")
-        for boundary in ("심화 조사를 권장", "staged 삭제", "사용자가 승인한 범위만", "fresh 독립 reviewer", "미결정", "기존 runtime"):
+        for boundary in ("심화 조사를 권장", "staged 삭제", "사용자가 승인한 범위만", "fresh 독립 reviewer", "미결정", "기존 runtime",
+                         "Git 저장소에 접근할 수 있으면 관련 이력", "자료에서 확인", "사용자 확인",
+                         "해당 없음 — 이유", "미해결 — 다음 질문/행동", "코드가 답하지 못하는 이유",
+                         "실질적으로 바꿀 정보", "고정 세트를 일괄 생성하거나 빈 문서를 채우지 않는다"):
             self.assertIn(boundary, onboarding)
+        readme = (ROOT / "README.md").read_text(encoding="utf-8")
+        first_use = markdown_section(readme, "## 첫 작업 시작하기")
+        for guidance in ("평소 말투로 요청", "역할 이름을 외우지 않아도", "코드로 알 수 없는 프로젝트 규칙",
+                         "제가 요구사항과 계획을 승인하면 구현하고 검증", "이전 Tram 작업을 확인하고 이어서 진행",
+                         "진행 단계, 승인·검증 상태와 다음 행동을 표로"):
+            self.assertIn(guidance, first_use)
         self.assertIn("project-onboarding.md", read("skills/init/SKILL.md"))
         self.assertIn("user-questions.md", read("context/runtime-contract.md"))
         for host in ("codex", "claude"):
