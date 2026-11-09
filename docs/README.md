@@ -25,4 +25,4 @@
 | 커버리지 개선 | [HTML](diagrams/coverage-loop.html) | [PNG](diagrams/coverage-loop.png) |
 | 성능 개선 | [HTML](diagrams/perf-loop.html) | [PNG](diagrams/perf-loop.png) |
 
-현재 후보는 0.0.1/schema 2입니다. Codex·Claude Code용 공개 알파를 준비 중이며, 패키지 검사와 실제 호스트 전체 동작 검증은 [검증 현황](release-validation.md)에서 구분합니다.
+현재 후보는 0.0.1/schema 2입니다. 2026-11-08 기준 Codex CLI의 로컬 설치·목록 조회와 현재 대화의 선택형 질문 UI는 확인했지만, 공개 Git 설치와 전체 호스트 lifecycle은 검증되지 않았습니다. 확인 범위와 미검증 항목은 [검증 현황](release-validation.md)에서 구분합니다.

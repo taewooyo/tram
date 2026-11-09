@@ -31,7 +31,7 @@ def markdown_section(content, heading):
 class SkillContracts(unittest.TestCase):
     def test_guided_onboarding_and_native_question_contracts(self):
         questions = read("context/user-questions.md")
-        for boundary in ("실제 도구로 질문", "추천 선택지를 먼저", "자유롭게 입력", "의존하는 질문", "필요한 자유 입력을 지원하지", "일반 대화",
+        for boundary in ("선택형 결정은 사용 가능하면 실제 도구로 질문", "긴 설명이나 여러 맥락이 필요한 답변은 일반 대화", "질문을 쪼개지 않는다", "검토 대상과 승인 범위를 대화에 명확히", "추천 선택지를 먼저", "자유롭게 입력", "의존하는 질문", "필요한 자유 입력을 지원하지", "일반 대화",
                          "도구 접수·실제 화면 표시·사용자의 응답은 별개", "실제 확인하지 않은 화면 표시와 응답을 성공으로 보고하지 않는다",
                          "명시적 응답"):
             self.assertIn(boundary, questions)

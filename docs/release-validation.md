@@ -1,5 +1,11 @@
 # Tram 릴리스 검증 기록
 
+## 설명 문서 정합성 확인 · 2026-11-09
+
+- README와 관련 HTML 도식을 현재 정본·검증 기록에 대조했다. README에는 선택형 하네스 관찰의 역할과 한계를 추가했고, `build/codex/README.md`·`build/claude/README.md`는 빌드로 동기화한다.
+- `os-flow.html`에서 현재 절차에 없는 조건부 footprint 스캔 단계를 제거했다. `context-system.html`에는 검사·정책 후보 관찰이 실행 증거나 승인·완료 판정을 대체하지 않는다는 경계를 반영했다. 두 PNG를 다시 렌더해 잘림과 새 문구를 직접 확인했다.
+- 이 확인은 저장소 문서의 정합성 검사이며 실제 호스트 lifecycle 검증을 추가하지 않는다. README 패키지 생성 검사는 `scripts/build.py --check` 결과를 따른다.
+
 ## 현재 후보 설치·질문 UI 확인 · 2026-11-08
 
 - 실제 Codex CLI 0.166.0에서 별도 `CODEX_HOME`을 사용해 저장소 로컬 marketplace 등록·설치·목록 조회를 수행했다. 현재 `build/codex`의 init 스킬과 격리 설치 cache 파일이 일치했다. 동일 절차를 자동 회귀 검사 `tests/test_codex_plugin_install.py`에 추가했다. 공개 Git 원격에서의 설치나 Desktop 전체 동작 검증은 아니다.
